@@ -5,28 +5,38 @@ import RegisterForm from "./components/RegisterForm";
 import LoginForm from "./components/LoginForm";
 import CalorieForm from "./components/CalorieForm";
 
+/**
+ * Main App component that handles routing and navigation.
+ * Dynamically shows login/register or calorie tools based on auth state.
+ *
+ * @component
+ */
 export default function App() {
+  /** @type {[boolean, Function]} isLoggedIn - Whether the user is authenticated */
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(localStorage.getItem("token")));
   const navigate = useNavigate();
 
-  // 🔄 Keep state in sync with localStorage token changes
+  // 📦 Keep state in sync with storage changes (e.g. across tabs)
   useEffect(() => {
     const onStorage = () => setIsLoggedIn(Boolean(localStorage.getItem("token")));
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
   }, []);
 
+  // 🔄 React to custom "auth-change" events
   useEffect(() => {
     const updateAuth = () => setIsLoggedIn(Boolean(localStorage.getItem("token")));
     window.addEventListener("auth-change", updateAuth);
-    window.addEventListener("storage", updateAuth); // still handle other tabs
+    window.addEventListener("storage", updateAuth);
     return () => {
       window.removeEventListener("auth-change", updateAuth);
       window.removeEventListener("storage", updateAuth);
     };
   }, []);
 
-  // ✅ Logout handler
+  /**
+   * Logs the user out and redirects to login.
+   */
   const handleLogout = () => {
     localStorage.removeItem("token");
     setIsLoggedIn(false);
@@ -41,7 +51,6 @@ export default function App() {
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/register">Register</Nav.Link>
 
-            {/* Show Login OR Logout depending on auth state */}
             {!isLoggedIn ? (
               <Nav.Link as={Link} to="/login">Login</Nav.Link>
             ) : (

@@ -3,13 +3,32 @@ import { Form, Button, Alert, Toast, ToastContainer } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 
+/**
+ * LoginForm component for authenticating users.
+ * Allows users to log in using email and password.
+ * On successful login, stores token, shows a toast, and redirects.
+ *
+ * @component
+ */
 export default function LoginForm() {
+  /** @type {[string, Function]} */
   const [email, setEmail] = useState("");
+
+  /** @type {[string, Function]} */
   const [password, setPassword] = useState("");
-  const [msg, setMsg] = useState(null);        // for error messages
+
+  /** @type {[{type: string, text: string} | null, Function]} */
+  const [msg, setMsg] = useState(null); // Error message
+
+  /** @type {[boolean, Function]} */
   const [showToast, setShowToast] = useState(false);
+
   const navigate = useNavigate();
 
+  /**
+   * Handles login form submission and authentication.
+   * @param {React.FormEvent} e
+   */
   const submit = async (e) => {
     e.preventDefault();
     try {
@@ -19,9 +38,8 @@ export default function LoginForm() {
       });
       localStorage.setItem("token", data.access_token);
       window.dispatchEvent(new Event("auth-change"));
-      setMsg(null);                    // clear any old alerts
-      setShowToast(true);              // show the success toast
-      // navigate to /calories after 2 seconds
+      setMsg(null);
+      setShowToast(true);
       setTimeout(() => navigate("/calories"), 2000);
     } catch (err) {
       setMsg({ type: "danger", text: err.message });
@@ -54,7 +72,7 @@ export default function LoginForm() {
         </Button>
       </Form>
 
-      {/* Success Toast */}
+      {/* Toast for successful login */}
       <ToastContainer position="top-end" className="p-3">
         <Toast
           bg="success"

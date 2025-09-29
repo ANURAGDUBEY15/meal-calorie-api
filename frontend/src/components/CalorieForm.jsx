@@ -2,18 +2,42 @@ import { useState } from "react";
 import { Form, Button, Alert, Table, Spinner } from "react-bootstrap";
 import { api } from "../api/client";
 
+/**
+ * CalorieForm component allows users to input a dish name and number of servings,
+ * then fetches and displays nutritional information including total calories
+ * and macronutrients like protein, fat, and carbohydrates.
+ *
+ * @component
+ * @returns {JSX.Element} A form with fields for dish name and servings, and a results table.
+ */
 export default function CalorieForm() {
+  /** @type {[string, Function]} dish - Name of the dish entered by the user */
   const [dish, setDish] = useState("");
+
+  /** @type {[number, Function]} servings - Number of servings for the dish */
   const [servings, setServings] = useState(1);
+
+  /** @type {[Object|null, Function]} result - API response containing nutrition data */
   const [result, setResult] = useState(null);
+
+  /** @type {[string|null, Function]} error - Error message, if the API call fails */
   const [error, setError] = useState(null);
+
+  /** @type {[boolean, Function]} loading - Loading state to disable form and show spinner */
   const [loading, setLoading] = useState(false);
 
+  /**
+   * Handles the form submission, sends dish and servings to API,
+   * and updates result or error based on the response.
+   *
+   * @param {React.FormEvent} e - Form submit event
+   */
   const submit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setResult(null);
+
     try {
       const data = await api("/get-calories", {
         method: "POST",
@@ -29,8 +53,11 @@ export default function CalorieForm() {
 
   return (
     <>
+      {/* Form for inputting dish and servings */}
       <Form onSubmit={submit} className="p-3 shadow-sm bg-light rounded">
         {error && <Alert variant="danger">{error}</Alert>}
+
+        {/* Dish name input */}
         <Form.Group className="mb-3">
           <Form.Label>Dish Name</Form.Label>
           <Form.Control
@@ -40,6 +67,8 @@ export default function CalorieForm() {
             disabled={loading}
           />
         </Form.Group>
+
+        {/* Servings input */}
         <Form.Group className="mb-3">
           <Form.Label>Servings</Form.Label>
           <Form.Control
@@ -52,6 +81,8 @@ export default function CalorieForm() {
             disabled={loading}
           />
         </Form.Group>
+
+        {/* Submit button */}
         <Button type="submit" variant="success" className="w-100" disabled={loading}>
           {loading ? (
             <>
@@ -71,6 +102,7 @@ export default function CalorieForm() {
         </Button>
       </Form>
 
+      {/* Results table */}
       {result && !loading && (
         <Table striped bordered hover responsive className="mt-4">
           <tbody>
