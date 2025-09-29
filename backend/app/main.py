@@ -33,11 +33,11 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-     allow_origins=[
-        "http://localhost:5173",      # Vite dev
+    allow_origins=[
+        "http://localhost:5173",
         "http://127.0.0.1:5173",
-        "https://meal-calorie-api.vercel.app/",  # replace after deploy
-    ],
+        "https://meal-calorie-api.vercel.app",
+    ]
 )
 
 # Custom exception handler for rate limit exceeded errors
