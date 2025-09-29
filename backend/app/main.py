@@ -30,10 +30,14 @@ app = FastAPI(title="Meal Calorie Count Generator (USDA)")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Frontend URL
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+     allow_origins=[
+        "http://localhost:5173",      # Vite dev
+        "http://127.0.0.1:5173",
+        "https://meal-calorie-api.vercel.app/",  # replace after deploy
+    ],
 )
 
 # Custom exception handler for rate limit exceeded errors
