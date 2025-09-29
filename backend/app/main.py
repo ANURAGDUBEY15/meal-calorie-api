@@ -8,7 +8,6 @@ from .config import settings
 from .database import Base, engine
 from .routers import auth, calories
 
-print("Loaded USDA key:", settings.USDA_API_KEY)
 # Create database tables based on models
 Base.metadata.create_all(bind=engine)
 
