@@ -15,6 +15,17 @@ interface LoginFormProps {
   setToast: (toast: { type: 'success' | 'error'; message: string } | null) => void;
 }
 
+/**
+ * LoginForm component for user authentication.
+ * Allows users to log in with email and password, shows validation and error messages, and handles redirection on success.
+ *
+ * @component
+ * @param {Object} props
+ * @param {boolean} [props.darkMode] - Whether dark mode is enabled
+ * @param {(toast: { type: 'success' | 'error'; message: string } | null) => void} props.setToast - Function to show toast messages
+ * @returns {JSX.Element}
+ */
+
 const LoginForm: React.FC<LoginFormProps> = ({ darkMode, setToast }) => {
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState<string | null>(null);
