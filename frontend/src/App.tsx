@@ -53,7 +53,7 @@ const App: React.FC = () => {
                 Meal Calorie Counter
               </span>
             </Link>
-            {/* Hamburger for mobile */}
+            {/* Hamburger for mobile  */}
             <div className={styles.hamburgerWrap}>
               <Hamburger onClick={() => setNavOpen(o => !o)} isOpen={navOpen} />
             </div>
