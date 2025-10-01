@@ -35,7 +35,7 @@ h1 {
   line-height: 1.1;
 }
 
-button {
+button, .btn {
   border-radius: 8px;
   border: 1px solid transparent;
   padding: 0.6em 1.2em;
@@ -44,10 +44,19 @@ button {
   font-family: inherit;
   background-color: #1a1a1a;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.18s cubic-bezier(.4,2,.6,1), background 0.18s;
+  box-shadow: 0 2px 8px 0 rgba(60,60,120,0.08);
 }
-button:hover {
+button:hover, .btn:hover, button:focus-visible, .btn:focus-visible {
   border-color: #646cff;
+  background: linear-gradient(90deg, #6366f1 0%, #818cf8 100%);
+  color: #fff;
+  transform: scale(1.045);
+  box-shadow: 0 4px 18px 0 rgba(99,102,241,0.18);
+}
+button:active, .btn:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px 0 rgba(99,102,241,0.10);
 }
 button:focus,
 button:focus-visible {
@@ -65,4 +74,24 @@ button:focus-visible {
   button {
     background-color: #f9f9f9;
   }
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100vw;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+#root {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+}
+
+body.dark {
+  background: #18181b !important;
 }

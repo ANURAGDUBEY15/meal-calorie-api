@@ -1,38 +1,26 @@
-import { useState } from "react";
-import { Form, Button, Alert, Toast, ToastContainer } from "react-bootstrap";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 
-/**
- * RegisterForm component for new user registration.
- * Collects user's name, email, and password, and submits to backend.
- * Shows success toast and redirects to login page.
- *
- * @component
- */
-export default function RegisterForm() {
-  /** @type {[Object, Function]} */
+export default function RegisterForm({ darkMode = false, setToast }) {
   const [form, setForm] = useState({
     first_name: "",
     last_name: "",
     email: "",
     password: "",
   });
-
-  /** @type {[{type: string, text: string} | null, Function]} */
-  const [msg, setMsg] = useState(null); // Error message
-
-  /** @type {[boolean, Function]} */
+  const [loading, setLoading] = useState(false);
+  const [touched, setTouched] = useState({});
+  const [msg, setMsg] = useState(null);
   const [showToast, setShowToast] = useState(false);
-
   const navigate = useNavigate();
 
-  /**
-   * Handles form submission to register new user.
-   * @param {React.FormEvent} e
-   */
   const submit = async (e) => {
     e.preventDefault();
+    setTouched({ first_name: true, last_name: true, email: true, password: true });
+    if (!form.first_name || !form.last_name || !form.email || !form.password) return;
+    setMsg(null);
+    setLoading(true);
     try {
       await api("/auth/register", {
         method: "POST",
@@ -42,48 +30,100 @@ export default function RegisterForm() {
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       setMsg({ type: "danger", text: err.message });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <>
-      <Form onSubmit={submit} className="p-3 shadow-sm bg-light rounded">
-        {msg && <Alert variant={msg.type}>{msg.text}</Alert>}
-
-        {["first_name", "last_name", "email", "password"].map((field) => (
-          <Form.Group className="mb-3" key={field}>
-            <Form.Label>{field.replace("_", " ")}</Form.Label>
-            <Form.Control
-              type={field === "password" ? "password" : "text"}
-              value={form[field]}
-              onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-              required
+    <div style={{
+      minHeight: '100vh',
+      width: '100vw',
+      display: 'flex',
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+      paddingTop: '6vh',
+    }}>
+      <div className="card mt-5 shadow-lg border-0 rounded-4 p-3 p-md-4 mx-2 mx-md-auto" style={{ maxWidth: 480, width: '100%', background: darkMode ? '#18181b' : '#fff' }}>
+        <div className="card-header text-center bg-transparent border-0 mb-3">
+          <h3 className="font-weight-bold text-gradient text-primary mb-1" style={{ fontSize: '2rem', fontWeight: 700 }}>Register</h3>
+          <p className="mb-0 text-secondary" style={{ fontSize: '1rem' }}>Create your account</p>
+        </div>
+        <form onSubmit={submit} noValidate>
+          {msg && <div className={`alert alert-${msg.type}`}>{msg.text}</div>}
+          <div className="mb-3">
+            <input
+              className={`form-control form-control-lg${touched.first_name && !form.first_name ? ' is-invalid' : ''}`}
+              type="text"
+              placeholder="First Name"
+              value={form.first_name}
+              onChange={e => setForm(f => ({ ...f, first_name: e.target.value }))}
+              onBlur={() => setTouched(t => ({ ...t, first_name: true }))}
+              autoComplete="given-name"
             />
-          </Form.Group>
-        ))}
-
-        <Button type="submit" variant="primary" className="w-100">
-          Register
-        </Button>
-      </Form>
-
-      {/* Toast for successful registration */}
-      <ToastContainer position="top-end" className="p-3">
-        <Toast
-          bg="success"
-          onClose={() => setShowToast(false)}
-          show={showToast}
-          delay={2000}
-          autohide
-        >
-          <Toast.Header closeButton={false}>
-            <strong className="me-auto">Success</strong>
-          </Toast.Header>
-          <Toast.Body className="text-white">
-            Registered successfully! Redirecting to login…
-          </Toast.Body>
-        </Toast>
-      </ToastContainer>
-    </>
+            {touched.first_name && !form.first_name && (
+              <div className="invalid-feedback text-start">First name is required.</div>
+            )}
+          </div>
+          <div className="mb-3">
+            <input
+              className={`form-control form-control-lg${touched.last_name && !form.last_name ? ' is-invalid' : ''}`}
+              type="text"
+              placeholder="Last Name"
+              value={form.last_name}
+              onChange={e => setForm(f => ({ ...f, last_name: e.target.value }))}
+              onBlur={() => setTouched(t => ({ ...t, last_name: true }))}
+              autoComplete="family-name"
+            />
+            {touched.last_name && !form.last_name && (
+              <div className="invalid-feedback text-start">Last name is required.</div>
+            )}
+          </div>
+          <div className="mb-3">
+            <input
+              className={`form-control form-control-lg${touched.email && !form.email ? ' is-invalid' : ''}`}
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+              onBlur={() => setTouched(t => ({ ...t, email: true }))}
+              autoComplete="email"
+            />
+            {touched.email && !form.email && (
+              <div className="invalid-feedback text-start">Email is required.</div>
+            )}
+          </div>
+          <div className="mb-3">
+            <input
+              className={`form-control form-control-lg${touched.password && !form.password ? ' is-invalid' : ''}`}
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+              onBlur={() => setTouched(t => ({ ...t, password: true }))}
+              autoComplete="new-password"
+            />
+            {touched.password && !form.password && (
+              <div className="invalid-feedback text-start">Password is required.</div>
+            )}
+          </div>
+          <button type="submit" disabled={loading} className="btn btn-lg btn-primary w-100 text-white shadow-sm mt-2" style={{ fontWeight: 600, fontSize: '1.1rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+            {loading ? <span>Registering...</span> : 'Register'}
+          </button>
+          <div className="text-center mt-3">
+            Already have an account? <a href="/login" className="text-primary font-weight-bold">Login</a>
+          </div>
+        </form>
+        {/* Toast for successful registration */}
+        <div className="position-fixed top-0 end-0 p-3" style={{ zIndex: 9999 }}>
+          <div className={`toast align-items-center text-white bg-success border-0${showToast ? ' show' : ''}`} role="alert" aria-live="assertive" aria-atomic="true">
+            <div className="d-flex">
+              <div className="toast-body">Registered successfully! Redirecting to login…</div>
+              <button type="button" className="btn-close btn-close-white me-2 m-auto" aria-label="Close" onClick={() => setShowToast(false)}></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

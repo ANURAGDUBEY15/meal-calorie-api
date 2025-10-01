@@ -5,13 +5,41 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-    USDA_API_KEY: str = os.getenv("USDA_API_KEY", "")
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "")
-    JWT_SECRET: str = os.getenv("JWT_SECRET", "changeme")
-    JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
-    RATE_LIMIT_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_PER_MINUTE", 15))
-    CACHE_TTL_SECONDS: int = int(os.getenv("CACHE_TTL_SECONDS", 300))
+    def __init__(self):
+        self._usda_api_key = os.getenv("USDA_API_KEY", "")
+        self._database_url = os.getenv("DATABASE_URL", "")
+        self._jwt_secret = os.getenv("JWT_SECRET", "changeme")
+        self._jwt_algorithm = os.getenv("JWT_ALGORITHM", "HS256")
+        self._access_token_expire_minutes = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 60))
+        self._rate_limit_per_minute = int(os.getenv("RATE_LIMIT_PER_MINUTE", 15))
+        self._cache_ttl_seconds = int(os.getenv("CACHE_TTL_SECONDS", 300))
 
-# Create a global settings instance
+    @property
+    def USDA_API_KEY(self):
+        return self._usda_api_key
+
+    @property
+    def DATABASE_URL(self):
+        return self._database_url
+
+    @property
+    def JWT_SECRET(self):
+        return self._jwt_secret
+
+    @property
+    def JWT_ALGORITHM(self):
+        return self._jwt_algorithm
+
+    @property
+    def ACCESS_TOKEN_EXPIRE_MINUTES(self):
+        return self._access_token_expire_minutes
+
+    @property
+    def RATE_LIMIT_PER_MINUTE(self):
+        return self._rate_limit_per_minute
+
+    @property
+    def CACHE_TTL_SECONDS(self):
+        return self._cache_ttl_seconds
+
 settings = Settings()

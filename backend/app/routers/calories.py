@@ -1,27 +1,23 @@
+
 from fastapi import APIRouter, Depends
 from ..schemas import CaloriesIn, CaloriesOut
-from ..services.fooddata import fooddata_service
+from ..services.fooddata import FoodDataService, IFoodDataService
 from ..security import get_current_user
+
+def get_fooddata_service() -> IFoodDataService:
+    return FoodDataService()
 
 router = APIRouter(tags=["calories"])
 
 @router.post("/get-calories", response_model=CaloriesOut)
-async def get_calories(payload: CaloriesIn, user=Depends(get_current_user)):
+async def get_calories(
+    payload: CaloriesIn,
+    user=Depends(get_current_user),
+    fooddata_service: IFoodDataService = Depends(get_fooddata_service)
+):
     """
     Guaranteed-safe calorie endpoint.
     Always returns a CaloriesOut object even if USDA fails.
     """
-    try:
-        return fooddata_service.compute_calories(payload.dish_name, payload.servings)
-    except Exception as e:
-        # Fall back gracefully with 0 calories and include the error message for debugging
-        return CaloriesOut(
-            dish_name=payload.dish_name,
-            servings=payload.servings,
-            calories_per_serving=0.0,
-            total_calories=0.0,
-            source="USDA FoodData Central",
-            selection=None,
-            macros=None,
-            raw={"error": str(e)}
-        )
+    result = fooddata_service.compute_calories(payload.dish_name, payload.servings)
+    return CaloriesOut(**result)

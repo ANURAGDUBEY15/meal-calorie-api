@@ -1,45 +1,37 @@
 import requests
 from cachetools import TTLCache
-from typing import Any, Dict
+from typing import Any, Dict, Protocol
 from ..config import settings
 from ..utils.fuzzy import FuzzySelector
 
 # USDA FoodData Central API search endpoint
 USDA_SEARCH_URL = "https://api.nal.usda.gov/fdc/v1/foods/search"
 
+class IFoodDataService(Protocol):
+    def search_food(self, query: str) -> Dict[str, Any]: ...
+    def compute_calories(self, query: str, servings: float) -> dict: ...
 
 class FoodDataService:
     def __init__(self):
-        # Initialize in-memory cache with a max size and TTL (time-to-live)
-        self.cache = TTLCache(maxsize=512, ttl=settings.CACHE_TTL_SECONDS)
+        # _cache is a protected attribute
+        self._cache = TTLCache(maxsize=512, ttl=settings.CACHE_TTL_SECONDS)
 
     def _cache_key(self, q: str) -> str:
-        # Normalize query string for use as cache key
         return q.strip().lower()
 
     def search_food(self, query: str) -> Dict[str, Any]:
-        # Search for a food item in USDA database; use cache if available
         key = self._cache_key(query)
-
-        if key in self.cache:
-            return self.cache[key]
-
-        # Set up query parameters for the API call
+        if key in self._cache:
+            return self._cache[key]
         params = {
             "query": query,
             "api_key": settings.USDA_API_KEY,
             "pageSize": 25
         }
-
-        # Make HTTP GET request to USDA API
         r = requests.get(USDA_SEARCH_URL, params=params, timeout=10)
-        r.raise_for_status()  # Raise exception for HTTP errors
-
+        r.raise_for_status()
         data = r.json()
-
-        # Cache the result for future use
-        self.cache[key] = data
-
+        self._cache[key] = data
         return data
 
     @staticmethod
@@ -89,22 +81,16 @@ class FoodDataService:
         Performs fuzzy matching to select the most relevant food item.
         """
         try:
-            # Search for food data via USDA API
             data = self.search_food(query)
             foods = data.get("foods", [])
             if not foods:
                 raise ValueError("Dish not found")
-
-            # Use fuzzy matching to select best match
             best = FuzzySelector.pick_best(query, foods)
             if not best:
                 raise ValueError("Dish not found")
-
-            # Extract energy and macros from the selected food item
             energy, macros = self.extract_energy_macros(best)
             cal_per_serving = float(energy or 0.0)
             total = cal_per_serving * float(servings)
-
             return {
                 "dish_name": query,
                 "servings": float(servings),
@@ -119,7 +105,6 @@ class FoodDataService:
                 "macros": macros,
             }
         except Exception as e:
-            # Handle errors gracefully, return fallback structure
             return {
                 "dish_name": query,
                 "servings": float(servings),
@@ -130,7 +115,3 @@ class FoodDataService:
                 "macros": None,
                 "raw": {"error": str(e)},
             }
-
-
-# Initialize a singleton instance (optional, for shared use across app)
-fooddata_service = FoodDataService()

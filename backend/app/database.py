@@ -3,23 +3,31 @@ from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from .config import settings
 
 # Create a SQLAlchemy engine with connection pooling
-engine = create_engine(
-    settings.DATABASE_URL,
-    echo=False,          # Set to True for SQL query logging (useful in dev)
-    pool_pre_ping=True   # Ensures connections are alive before using them
-)
+class Database:
+    def __init__(self, db_url):
+        self._engine = create_engine(
+            db_url,
+            echo=False,
+            pool_pre_ping=True
+        )
+        self._SessionLocal = sessionmaker(bind=self._engine, autocommit=False, autoflush=False)
 
-# Session factory for database interactions
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+    @property
+    def engine(self):
+        return self._engine
 
-# Base class for all ORM models
+    @property
+    def SessionLocal(self):
+        return self._SessionLocal
+
 class Base(DeclarativeBase):
     pass
 
-# Database session dependency for FastAPI routes
+db = Database(settings.DATABASE_URL)
+
 def get_db():
-    db = SessionLocal()
+    db_session = db.SessionLocal()
     try:
-        yield db
+        yield db_session
     finally:
-        db.close()  # Ensures DB session is closed after request
+        db_session.close()

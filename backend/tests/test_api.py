@@ -2,7 +2,7 @@ import os
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
-from app.database import Base, engine
+from app.database import Base, db
 from app.models import User
 from app.security import AuthService
 
@@ -17,7 +17,7 @@ def setup_db():
     Setup the database tables before each test.
     For demo tests, use the same DB and ensure tables exist.
     """
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=db.engine)
     yield
     # Optionally, clean up after tests here if needed
 
@@ -54,13 +54,13 @@ def test_nonexistent_dish(monkeypatch):
     """
     token = register_and_login("nofood@example.com")
 
-    # Patch the fooddata_service.search_food to simulate no results found
-    from app.services.fooddata import fooddata_service
+    # Patch FoodDataService.search_food to simulate no results found
+    from app.services.fooddata import FoodDataService
 
-    def fake_search(_):
+    def fake_search(self, _):
         return {"foods": []}
 
-    monkeypatch.setattr(fooddata_service, "search_food", fake_search)
+    monkeypatch.setattr(FoodDataService, "search_food", fake_search)
 
     res = client.post(
         "/get-calories",
