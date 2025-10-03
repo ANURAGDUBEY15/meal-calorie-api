@@ -15,10 +15,12 @@ export default function RegisterForm({ darkMode = false, setToast }) {
   const [showToast, setShowToast] = useState(false);
   const navigate = useNavigate();
 
+  const isPasswordValid = form.password.length >= 8;
+
   const submit = async (e) => {
     e.preventDefault();
     setTouched({ first_name: true, last_name: true, email: true, password: true });
-    if (!form.first_name || !form.last_name || !form.email || !form.password) return;
+    if (!form.first_name || !form.last_name || !form.email || !form.password || !isPasswordValid) return;
     setMsg(null);
     setLoading(true);
     try {
@@ -29,7 +31,20 @@ export default function RegisterForm({ darkMode = false, setToast }) {
       setShowToast(true);
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
-      setMsg({ type: "danger", text: err.message });
+      // User-friendly error messages
+      let message = 'Registration failed. Please try again.';
+      if (err && err.message) {
+        if (err.message.toLowerCase().includes('email')) {
+          message = 'This email is already registered.';
+        } else if (err.message.toLowerCase().includes('password')) {
+          message = 'Password does not meet requirements.';
+        } else if (err.message.toLowerCase().includes('required')) {
+          message = 'Please fill in all required fields.';
+        } else {
+          message = err.message;
+        }
+      }
+      setMsg({ type: "danger", text: message });
     } finally {
       setLoading(false);
     }
@@ -95,7 +110,7 @@ export default function RegisterForm({ darkMode = false, setToast }) {
           </div>
           <div className="mb-3">
             <input
-              className={`form-control form-control-lg${touched.password && !form.password ? ' is-invalid' : ''}`}
+              className={`form-control form-control-lg${touched.password && (!form.password || !isPasswordValid) ? ' is-invalid' : ''}`}
               type="password"
               placeholder="Password"
               value={form.password}
@@ -105,6 +120,9 @@ export default function RegisterForm({ darkMode = false, setToast }) {
             />
             {touched.password && !form.password && (
               <div className="invalid-feedback text-start">Password is required.</div>
+            )}
+            {touched.password && form.password && !isPasswordValid && (
+              <div className="invalid-feedback text-start">Password must be at least 8 characters.</div>
             )}
           </div>
           <button type="submit" disabled={loading} className="btn btn-lg btn-primary w-100 text-white shadow-sm mt-2" style={{ fontWeight: 600, fontSize: '1.1rem', borderRadius: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>

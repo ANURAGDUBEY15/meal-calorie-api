@@ -3,7 +3,8 @@
  * Defaults to localhost if not provided.
  * @constant {string}
  */
-export const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+export const API_BASE =
+  import.meta.env.VITE_API_BASE || "https://meal-calorie-api.onrender.com";
 
 /**
  * Generic helper to make API calls with JSON body and authorization header.
