@@ -236,8 +236,9 @@ html, body {
   width: 100%;
 }
 
+
 body:not(.__dark_td054_98_1wqyz_149) {
-  background-color: #312e81;
+  background: url('/health-bg.svg') center center/cover no-repeat !important;
 }
 
 body.__dark_td054_98_1wqyz_149 {

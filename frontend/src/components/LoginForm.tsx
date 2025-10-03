@@ -77,9 +77,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ darkMode, setToast }) => {
       minHeight: '100vh',
       width: '100vw',
       display: 'flex',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       justifyContent: 'center',
-      paddingTop: '6vh',
+      overflow: 'hidden',
     }}>
       <div className="card mt-5 shadow-lg border-0 rounded-4 p-3 p-md-4 mx-2 mx-md-auto" style={{ maxWidth: 480, width: '100%', background: darkMode ? '#18181b' : '#fff' }}>
         <div className="card-header text-center bg-transparent border-0 mb-3">
