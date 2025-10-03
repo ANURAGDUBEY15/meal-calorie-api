@@ -1,4 +1,15 @@
-import { useEffect, useState } from "react";
+/**
+ * RegisterForm component for new user registration.
+ * Collects user's name, email, and password, and submits to backend. Shows success toast and redirects to login page.
+ *
+ * @component
+ * @param {Object} props
+ * @param {boolean} [props.darkMode] - Whether dark mode is enabled
+ * @param {(toast: { type: 'success' | 'error'; message: string } | null) => void} props.setToast - Function to show toast messages
+ * @returns {JSX.Element}
+ */
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 
